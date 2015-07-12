@@ -1,0 +1,168 @@
+body,button {
+	font-family:"Open Sans", Arial;
+	font-weight:300;
+}
+
+body {
+	
+	margin-left:0;
+	margin-right:0;
+}
+#contents,
+#container {
+	display:block;
+	margin:0 auto;
+	width:462px;
+}
+#container {
+	position:relative;
+	text-align:center;
+}
+#congratulations {
+	top: 60px;
+	left: 0;
+	right: 0;
+	bottom: 110px;
+	background: rgba(255,255,255,0.9);
+	position: absolute;
+	z-index: 1;
+	font-size: 59px;
+}
+button, td {
+	-moz-transition: all .1s ease-in;
+    -o-transition: all .1s ease-in;
+    -webkit-transition: all .1s ease-in;
+    transition: all .1s ease-in;
+}
+
+button {
+	box-sizing: border-box;
+	border-radius: 5px;
+	border: 0;
+	min-height: 49px;
+	outline:0;
+	font-size:32px;
+	
+}
+
+#generate {
+	display:block;
+	width: 462px;
+	height: 49px;
+	margin-bottom:18px;
+	background: #39d;
+	color: white;
+}
+#bottom-line {
+	margin-top:16px;
+	margin-left:-2px;
+	text-align:left;
+}
+.play-record {
+	font-size:22px;
+}
+#ads {
+	width: 462px;
+	margin: 10px auto 0 auto;
+}
+.hand {
+  width: 90px;
+  margin-top:2px;
+  margin-left:2px;
+  margin-right:0;
+}
+
+#generate:hover {
+	background:#4ae;
+}
+
+#generate:active {
+	background:#28c;
+}
+
+.hand {
+	background:#ccc;
+}
+
+.hand:hover {
+	background:#eee;
+}
+
+.hand:active {
+	background:#bbb;
+}
+.hand.hand-in-hand {
+	background:#234;
+	color:white;
+}
+.hand.hand-in-hand:hover {
+	background:#468;
+	color:white;
+}
+
+.hand.hand-in-hand:active {
+	background:#123;
+	color:white;
+}
+
+
+
+.sudoku-table {
+	border-collapse: collapse;
+	border:2px solid #234;
+}
+
+.sudoku-table td {
+	border:1px solid #234;
+	position:relative;
+	width:48px;
+	height:48px;
+	text-align: center;
+	font-size: 32px;
+}
+.odd-block {
+	background:rgba(0,0,0,0.04);
+}
+.maybe {
+	font-size:10px;
+}
+.solving .maybe {
+	display:none;
+}
+
+.error {
+	background:#f2dede!important;
+}
+
+.hand.solved-number,
+.active-number.solved-number {
+	background:#d9edf7;
+	color:#222;
+}
+
+
+
+.active-number {
+	background:#fcf8e3;
+}
+
+
+.box-bottom-border:after {
+	content: " ";
+	position:absolute;
+	bottom:0;
+	left:0;
+	right:0;
+	height:1px;
+	background:#234;
+}
+
+.box-right-border:before {
+	content: " ";
+	position:absolute;
+	bottom:0;
+	top:0;
+	right:0;
+	width:1px;
+	background:#234;
+}

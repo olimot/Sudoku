@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Sudoku</title>
+	<meta name="viewport" content="width=462,height=device-height"/>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,800,300' rel='stylesheet' type='text/css'>
+	<link rel="icon" type="image/png" href="http://play.eldwis.com/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="http://play.eldwis.com/sudoku/jquery.mobile.custom.min.js"></script>
+  </head>
+  <body>
+    <div id="container"></div>
+	<div id="contents"></div>
+	<script src="sudoku.js"></script>
+	<script>
+	;(function($, window, document, undefined){
+		$.Sudoku = function(){
+			var level_label = ['Lv 1','Lv 2','Lv 3','Lv 4','Lv 5'];
+			var $sudokuGame = $('<div class="sudoku-game">'), $sudoku = $('<table class="sudoku-table">'), game = new Sudoku();
+			var $generator = $('<button id="generate">Generate '+ level_label[game.level()] +'</button>');
+			var $finish = $('<div id="congratulations"><div class="message"></div><div class="record"></div></div>');
+			var $playRecord = $('<span class="play-record"> 00:00:00 </span>');
+			$sudokuGame.append($finish);
+			$sudokuGame.data('inhand', 1);
+			$sudokuGame.append($generator);
+			for(var i=0; i<9; i++){
+				var $tr = $('<tr>');
+				for(var j=0; j<9; j++){
+					var $td = $('<td></td>').data('id', i*9 + j).on('mousedown', function(e){
+						var id = $(this).data('id');
+						if(!game.table.cells[id].given){
+							var inhand = $sudokuGame.data('inhand');
+							if(e.which == 1){
+								$(this).removeClass();
+								if($(this).data('box-bottom')) $(this).addClass('box-bottom-border');
+								if($(this).data('box-right')) $(this).addClass('box-right-border');
+								$(this).addClass($(this).data('isEvenBlock')?'even-block':'odd-block');
+								game.table.cells[id].solving = true;
+								game.table.cells[id].value = inhand;
+								if(game.table.cells[id].isError()){
+									$(this).addClass('error');
+								}else{
+									$(this).addClass('active-number solving number-'+inhand);
+									if($('.number-'+inhand).length == 9){
+										$('.hand-'+inhand+', .number-'+inhand).addClass('solved-number');
+									}
+									if($('.hand.solved-number').length == 9){
+										clearInterval($playRecord.data('timer'));
+										$finish.find('.record').html($playRecord.html());
+										$finish.find('.message').html('Congratulations!');
+										$finish.fadeIn();
+									}
+								}
+								$(this).find('.input').html( $sudokuGame.data('inhand') );
+							}else if(e.which == 2){
+								if($(this).find('.maybe-'+inhand).length==0)
+									$(this).append('<span class="maybe maybe-'+inhand+'">'+inhand+'</span>');
+								else
+									$(this).find('.maybe-'+inhand).remove();
+							}else if(e.which == 3){
+								$(this).removeClass();
+								if($(this).data('box-bottom')) $(this).addClass('box-bottom-border');
+								if($(this).data('box-right')) $(this).addClass('box-right-border');
+								$(this).addClass($(this).data('isEvenBlock')?'even-block':'odd-block');
+								game.table.cells[id].solving = false;
+								game.table.cells[id].value = 0;
+								$(this).find('.input').html('');
+								if($('.number-'+inhand).length == 9)
+									$('.hand-'+inhand+', .number-'+inhand).addClass('solved-number');
+								else
+									$('.hand-'+inhand+', .number-'+inhand).removeClass('solved-number');
+							}
+						}
+						e.preventDefault();
+						return false;
+					}).on('contextmenu', function(){return false;});
+					$tr.append($td);
+					var isEvenBlock = game.table.cells[i*9+j].block%2==0;
+					$td.addClass(isEvenBlock?'even-block':'odd-block').data('isEvenBlock', isEvenBlock);
+					if(i%3==2 && i!=8) $td.addClass('box-bottom-border').data('box-bottom', true);
+					if(j%3==2 && j!=8) $td.addClass('box-right-border').data('box-right', true);
+				}
+				$sudoku.append($tr);
+			}
+			$generator.on('tap', function(e){
+				e.preventDefault(); 
+				game.generate().done(function(){
+					$finish.fadeOut();
+					$sudoku.find('.maybe').remove();
+					$sudoku.find('.solved-number').removeClass('solved-number');
+					$sudoku.find('td').removeClass().each(function(index){
+						if($(this).data('box-bottom')) $(this).addClass('box-bottom-border');
+						if($(this).data('box-right')) $(this).addClass('box-right-border');
+						$(this).addClass($(this).data('isEvenBlock')?'even-block':'odd-block');
+						if(game.table.cells[index].given){
+							$(this).html( game.table.cells[index].value ).addClass('given-number number-'+game.table.cells[index].value);
+						}else{
+							$(this).html('<span class="input"></div>');
+						}
+					});
+					$playRecord.data('record', 0);
+					clearInterval($playRecord.data('timer'));
+					$playRecord.html(' 00:00:00 ');
+					$playRecord.data('timer', setInterval(function(){
+						$playRecord.data('record', $playRecord.data('record')+1);
+						var record = $playRecord.data('record');
+						var hour = parseInt(record / 3600);
+						var min = parseInt( (record/60) ) % 60;
+						var sec = record % 60;
+						if(hour<10) hour = '0' + hour;
+						if(min<10) min = '0' + min;
+						if(sec<10) sec = '0' + sec;
+						$playRecord.html(' '+hour+':'+min+':'+sec+' ');
+					}, 1000));
+					$('.number-'+$sudokuGame.data('inhand')).addClass('active-number');
+				});
+			}).on('swipeleft', function(e){
+				console.log('dello')
+				game.level(game.level()-1);
+				$generator.html('Generate '+ level_label[game.level()] +'');
+				e.preventDefault();
+				e.stopPropagation();
+			}).on('swiperight', function(e){
+				console.log('hello')
+				game.level(game.level()+1);
+				$generator.html('Generate '+ level_label[game.level()] +'');
+				e.preventDefault();
+				e.stopPropagation();
+			});
+			$sudokuGame.append($sudoku);
+			$bottomline = $('<div id="bottom-line"></div>');
+			for(var i=1; i<=9; i++){
+				var $btn = $('<button class="hand hand-'+i+'">'+i+'</button>').data('number', i).on('click',function(e){
+					$('.hand-in-hand').removeClass('hand-in-hand');
+					$(this).addClass('hand-in-hand');
+					$('.active-number').removeClass('active-number');
+					$('.number-'+$(this).data('number')).addClass('active-number');
+					$sudokuGame.data('inhand', $(this).data('number'));
+				});
+				$bottomline.append($btn)
+			}
+			
+			$bottomline.append($playRecord);  
+			$sudokuGame.append($bottomline);
+			$sudokuGame.find('.hand-1').addClass('hand-in-hand');
+			$(window).on('keydown',function(e){
+				if(49<=e.keyCode && e.keyCode<=57){
+					var number = e.keyCode-48;
+					$('.hand-'+number).trigger('click');
+				}else if(71 == e.keyCode){
+					$('#generate').trigger('click');
+				}
+			});
+			
+			return $sudokuGame;
+		}
+	})($, window,document);
+	var $sudoku = $.Sudoku();
+	$('#container').append($sudoku);
+	</script>
+  </body>
+</html>
