@@ -8,12 +8,34 @@ body {
 	margin-left:0;
 	margin-right:0;
 }
+
+#up-line i {
+	color:#39d;
+	font-size:32px;
+}
+
+#up-line i:hover {
+	color:#4ae;
+}
+
+#up-line i:active {
+	color:#28c;
+}
+
 #contents,
 #container {
 	display:block;
 	margin:0 auto;
 	width:462px;
 }
+#contents {
+	font-weight:400;
+}
+
+#contents h4 {
+	margin-top:0;
+}
+
 #container {
 	position:relative;
 	text-align:center;
@@ -22,13 +44,13 @@ body {
 	top: 60px;
 	left: 0;
 	right: 0;
-	bottom: 110px;
+	height:472px;
 	background: rgba(255,255,255,0.9);
 	position: absolute;
-	z-index: 1;
+	z-index: 99;
 	font-size: 59px;
 }
-button, td {
+#up-line i, button, td {
 	-moz-transition: all .1s ease-in;
     -o-transition: all .1s ease-in;
     -webkit-transition: all .1s ease-in;
@@ -44,18 +66,21 @@ button {
 	font-size:32px;
 	
 }
+#up-line {
+	margin-bottom:18px;
+}
 
 #generate {
-	display:block;
-	width: 462px;
+	display:inline-block;
+	width: 378px;
 	height: 49px;
-	margin-bottom:18px;
 	background: #39d;
 	color: white;
 }
 #bottom-line {
 	margin-top:16px;
 	margin-left:-2px;
+	margin-right: -20px;
 	text-align:left;
 }
 .play-record {
@@ -63,7 +88,7 @@ button {
 }
 #ads {
 	width: 462px;
-	margin: 10px auto 0 auto;
+	margin: 32px auto 0 auto;
 }
 .hand {
   width: 90px;
@@ -95,6 +120,7 @@ button {
 	background:#234;
 	color:white;
 }
+
 .hand.hand-in-hand:hover {
 	background:#468;
 	color:white;
@@ -105,11 +131,33 @@ button {
 	color:white;
 }
 
+.in-ctrl .hand.hand-in-hand {
+	position:relative;
+	background:#432;
+	color:white;
+}
+.in-ctrl .hand.hand-in-hand:before {
+	content:"guess";
+	position:absolute;
+	top:2px;
+	right:2px;
+	font-size:13px;
+	line-height:1;
+}
 
+.in-ctrl .hand.hand-in-hand:hover {
+	background:#864;
+	color:white;
+}
+
+.in-ctrl .hand.hand-in-hand:active {
+	background:#321;
+	color:white;
+}
 
 .sudoku-table {
 	border-collapse: collapse;
-	border:2px solid #234;
+	border:3px solid #234;
 }
 
 .sudoku-table td {
@@ -124,10 +172,62 @@ button {
 	background:rgba(0,0,0,0.04);
 }
 .maybe {
-	font-size:10px;
+	font-size:14px;
+	line-height:1;
+	position:absolute;
 }
+
+.maybe-1 {
+  top: 3px;
+  left: 5px;
+}
+
+.maybe-2 {
+  top: 3px;
+  left: 22px;
+}
+
+.maybe-3 {
+  top: 3px;
+  right: 5px;
+}
+
+.maybe-4 {
+  top: 18px;
+  left: 5px;
+}
+
+.maybe-5 {
+  top: 18px;
+  left: 22px;
+}
+
+.maybe-6 {
+  top: 18px;
+  right: 5px;
+}
+
+.maybe-7 {
+  bottom: 3px;
+  left: 5px;
+}
+
+.maybe-8 {
+  bottom: 3px;
+  left: 22px;
+}
+
+.maybe-9 {
+  bottom: 3px;
+  right: 5px;
+}
+.error .maybe,
 .solving .maybe {
 	display:none;
+}
+
+.solving .input{
+	color:#05A;
 }
 
 .error {
@@ -143,26 +243,28 @@ button {
 
 
 .active-number {
-	background:#fcf8e3;
+	background:#FFFF9B;
 }
 
 
 .box-bottom-border:after {
 	content: " ";
 	position:absolute;
-	bottom:0;
+	bottom:-1px;
 	left:0;
-	right:0;
-	height:1px;
+	width:50px;
+	height:3px;
 	background:#234;
+	z-index:1;
 }
 
 .box-right-border:before {
 	content: " ";
 	position:absolute;
-	bottom:0;
+	height:50px;
 	top:0;
-	right:0;
-	width:1px;
+	right:-1px;
+	width:3px;
+	z-index:1;
 	background:#234;
 }

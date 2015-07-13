@@ -239,7 +239,7 @@ Sudoku = (function (window, document, undefined) {
                             break;
                         }
                     }
-                    if( GivenNotEnough || givenCells.length <= thisLevel.minTotalGiven ){
+                    if( GivenNotEnough || givenCells.length < thisLevel.minTotalGiven ){
                         cell.given = true;
                         continueCycle();
                         return;

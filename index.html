@@ -2,29 +2,72 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Sudoku</title>
+    <title>Web Sudoku</title>
 	<meta name="viewport" content="width=462,height=device-height"/>
-	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,800,300' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Permanent+Marker' rel='stylesheet' type='text/css'>
 	<link rel="icon" type="image/png" href="http://play.eldwis.com/favicon.ico">
     <link rel="stylesheet" href="style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-	<script src="http://play.eldwis.com/sudoku/jquery.mobile.custom.min.js"></script>
+	<link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+    <script src="/jquery-2.1.4.min.js"></script>
+	<script src="jquery.mobile.custom.min.js"></script>
   </head>
   <body>
+	<a href="https://github.com/olimot/Sudoku"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+	
+	<img src="/img/title.png" style="opacity:0.05;position:fixed;bottom:0; right:0; z-index:-1;">
     <div id="container"></div>
-	<div id="contents"></div>
+	
+		<div id="ads">
+			<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+			<!-- For Web Sudoku -->
+			<ins class="adsbygoogle"
+				 style="display:inline-block;width:462px;height:90px"
+				 data-ad-client="ca-pub-9681504486002069"
+				 data-ad-slot="2184280697"></ins>
+			<script>
+			(adsbygoogle = window.adsbygoogle || []).push({});
+			</script>
+		</div>
+	
+	<div id="contents">
+	<h4>Play Instruction</h4>
+How to use interface:
+<ul><li>Swipe left or right the generate button to change the level</li>
+<li>Click the generate button to generate a game in the level shown at the label of button</li>
+<li>Click a number 1~9 below or simply press a key of 1~9 in keyboard to get a number in hand</li>
+<li>Then, click wherever you guess</li></ul>
+In the table you can use:
+
+<ul><li>Left click : put a number directly or remove it if numbers in table/hand are same</li>
+<li>Middle click or Ctrl + Left Click : put a guess(possible) number or remove it if numbers in table/hand are same</li>
+<li>Right click : remove number</li>
+	</div>
 	<script src="sudoku.js"></script>
 	<script>
 	;(function($, window, document, undefined){
 		$.Sudoku = function(){
 			var level_label = ['Lv 1','Lv 2','Lv 3','Lv 4','Lv 5'];
+			var generate_label = function(){ return 'Generate ' + level_label[game.level()] };
 			var $sudokuGame = $('<div class="sudoku-game">'), $sudoku = $('<table class="sudoku-table">'), game = new Sudoku();
-			var $generator = $('<button id="generate">Generate '+ level_label[game.level()] +'</button>');
+			var $upline = $('<div id="up-line">');
+			var $generator = $('<button id="generate" title="swipe left/right to change level">'+ generate_label() +'</button>');
+			var $downLevel = $('<i id="level-down" class="fa fa-arrow-left"></i>').click(function(){
+				game.level(game.level()-1);
+				$generator.html(generate_label());
+			});
+			var $upLevel = $('<i id="level-up" class="fa fa-arrow-right"></i>').click(function(){
+				game.level(game.level()+1);
+				$generator.html(generate_label());
+			});
 			var $finish = $('<div id="congratulations"><div class="message"></div><div class="record"></div></div>');
 			var $playRecord = $('<span class="play-record"> 00:00:00 </span>');
+			
+			$upline.append($downLevel).append('&nbsp;').append($generator).append('&nbsp;').append($upLevel);
+			
 			$sudokuGame.append($finish);
 			$sudokuGame.data('inhand', 1);
-			$sudokuGame.append($generator);
+			$sudokuGame.append($upline);
 			for(var i=0; i<9; i++){
 				var $tr = $('<tr>');
 				for(var j=0; j<9; j++){
@@ -32,7 +75,20 @@
 						var id = $(this).data('id');
 						if(!game.table.cells[id].given){
 							var inhand = $sudokuGame.data('inhand');
-							if(e.which == 1){
+							if(e.which == 3 || (e.which == 1 && game.table.cells[id].solving && inhand == game.table.cells[id].value )){
+								$(this).removeClass();
+								if($(this).data('box-bottom')) $(this).addClass('box-bottom-border');
+								if($(this).data('box-right')) $(this).addClass('box-right-border');
+								$(this).addClass($(this).data('isEvenBlock')?'even-block':'odd-block');
+								game.table.cells[id].solving = false;
+								game.table.cells[id].value = 0;
+								$(this).find('.input').html('');
+							}else if(e.which == 2 || (e.which == 1 && e.ctrlKey)){
+								if($(this).find('.maybe-'+inhand).length==0)
+									$(this).append('<span class="maybe maybe-'+inhand+'">'+inhand+'</span>');
+								else
+									$(this).find('.maybe-'+inhand).remove();
+							}else if(e.which == 1){
 								$(this).removeClass();
 								if($(this).data('box-bottom')) $(this).addClass('box-bottom-border');
 								if($(this).data('box-right')) $(this).addClass('box-right-border');
@@ -54,19 +110,8 @@
 									}
 								}
 								$(this).find('.input').html( $sudokuGame.data('inhand') );
-							}else if(e.which == 2){
-								if($(this).find('.maybe-'+inhand).length==0)
-									$(this).append('<span class="maybe maybe-'+inhand+'">'+inhand+'</span>');
-								else
-									$(this).find('.maybe-'+inhand).remove();
-							}else if(e.which == 3){
-								$(this).removeClass();
-								if($(this).data('box-bottom')) $(this).addClass('box-bottom-border');
-								if($(this).data('box-right')) $(this).addClass('box-right-border');
-								$(this).addClass($(this).data('isEvenBlock')?'even-block':'odd-block');
-								game.table.cells[id].solving = false;
-								game.table.cells[id].value = 0;
-								$(this).find('.input').html('');
+							}
+							for(var inhand=1;inhand<=9;inhand++){
 								if($('.number-'+inhand).length == 9)
 									$('.hand-'+inhand+', .number-'+inhand).addClass('solved-number');
 								else
@@ -89,7 +134,7 @@
 				game.generate().done(function(){
 					$finish.fadeOut();
 					$sudoku.find('.maybe').remove();
-					$sudoku.find('.solved-number').removeClass('solved-number');
+					$('.solved-number').removeClass('solved-number');
 					$sudoku.find('td').removeClass().each(function(index){
 						if($(this).data('box-bottom')) $(this).addClass('box-bottom-border');
 						if($(this).data('box-right')) $(this).addClass('box-right-border');
@@ -100,6 +145,7 @@
 							$(this).html('<span class="input"></div>');
 						}
 					});
+					
 					$playRecord.data('record', 0);
 					clearInterval($playRecord.data('timer'));
 					$playRecord.html(' 00:00:00 ');
@@ -115,17 +161,19 @@
 						$playRecord.html(' '+hour+':'+min+':'+sec+' ');
 					}, 1000));
 					$('.number-'+$sudokuGame.data('inhand')).addClass('active-number');
+					for(var inhand=1;inhand<=9;inhand++){
+						if($('.number-'+inhand).length == 9)
+							$('.hand-'+inhand+', .number-'+inhand).addClass('solved-number');
+					}
 				});
 			}).on('swipeleft', function(e){
-				console.log('dello')
 				game.level(game.level()-1);
-				$generator.html('Generate '+ level_label[game.level()] +'');
+				$generator.html(generate_label());
 				e.preventDefault();
 				e.stopPropagation();
 			}).on('swiperight', function(e){
-				console.log('hello')
 				game.level(game.level()+1);
-				$generator.html('Generate '+ level_label[game.level()] +'');
+				$generator.html(generate_label());
 				e.preventDefault();
 				e.stopPropagation();
 			});
@@ -149,6 +197,9 @@
 				if(49<=e.keyCode && e.keyCode<=57){
 					var number = e.keyCode-48;
 					$('.hand-'+number).trigger('click');
+				}else if(97<=e.keyCode && e.keyCode<=105){
+					var number = e.keyCode-96;
+					$('.hand-'+number).trigger('click');
 				}else if(71 == e.keyCode){
 					$('#generate').trigger('click');
 				}
@@ -159,6 +210,21 @@
 	})($, window,document);
 	var $sudoku = $.Sudoku();
 	$('#container').append($sudoku);
+	$(window).keydown(function(e){
+		if(e.keyCode == 17) $('body').addClass('in-ctrl');
+	});
+	$(window).keyup(function(e){
+		if(e.keyCode == 17) $('body').removeClass('in-ctrl') ;
+	});
+	</script>
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-65039573-1', 'auto');
+		ga('send', 'pageview');
 	</script>
   </body>
 </html>
