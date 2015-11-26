@@ -1,143 +1,156 @@
-body,button {
-	font-family:"Open Sans", Arial;
-	font-weight:300;
-}
-
 body {
-	
-	margin-left:0;
-	margin-right:0;
-}
-
-#up-line i {
-	color:#39d;
-	font-size:32px;
-}
-
-#up-line i:hover {
-	color:#4ae;
-}
-
-#up-line i:active {
-	color:#28c;
-}
-
-#contents,
-#container {
-	display:block;
-	margin:0 auto;
-	width:462px;
-}
-#contents {
+	font-family:"Open Sans", Arial;
+	color:#35506F;
+	font-size:16px;
 	font-weight:400;
+	margin:0;
+	padding:0;
 }
 
-#contents h4 {
-	margin-top:0;
+button {
+	font-size:inherit;
+	font-weight:inherit;
+	font-family:inherit;
+	box-sizing:border-box;
+	border:0;
+	margin:0;
+	padding:0;
+	color:inherit;
+	background:none;
+	outline:0;
+	line-height:44px;
+	height:44px;
 }
 
-#container {
-	position:relative;
-	text-align:center;
-}
-#congratulations {
-	top: 60px;
-	left: 0;
-	right: 0;
-	height:472px;
-	background: rgba(255,255,255,0.9);
-	position: absolute;
-	z-index: 99;
-	font-size: 59px;
-}
-#up-line i, button, td {
+button, td {
 	-moz-transition: all .1s ease-in;
     -o-transition: all .1s ease-in;
     -webkit-transition: all .1s ease-in;
     transition: all .1s ease-in;
 }
 
-button {
-	box-sizing: border-box;
-	border-radius: 5px;
-	border: 0;
-	min-height: 49px;
-	outline:0;
-	font-size:32px;
-	
-}
-#up-line {
-	margin-bottom:18px;
+.menu {
+	margin:3px 0;
+	overflow:hidden;
 }
 
-#generate {
-	display:inline-block;
-	width: 378px;
-	height: 49px;
-	background: #39d;
-	color: white;
+#GameView {
+	position:relative;
+	text-align:center;
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
-#bottom-line {
-	margin-top:16px;
-	margin-left:-2px;
-	margin-right: -20px;
-	text-align:left;
+
+/* Dimensions */
+
+#contents,
+#GameView {
+	display:block;
+	margin:0 auto;
+	width:460px;
 }
+
+.table-container,
+.table-container .layer {
+	width:460px;
+	height:460px;
+}
+
+
+/* Outer Contents of Game */
+
+
+/* Menu */
+.menu {
+	color:white;
+	background:#0080ff;
+}
+
+.menu-top {
+	background:#35506F;
+}
+
+.menu-top button {
+	padding:0 22px;
+	cursor:pointer;
+	color:rgba(255,255,255,0.8);
+}
+
+.menu-top button:hover {
+	color:#0080FF;
+	color:#fff;
+}
+
+.menu-top button:active {
+	color:#ff0;
+}
+
+.btn-generate {
+	width:66%;
+}
+
+.sudoku-info {
+	font-size:12px;
+	line-height:16px;
+	height:16px;
+	text-align:right;
+}
+
+.play-record,
+.numpad {
+	width: 20%;
+	display:block;
+	float:left;
+	height:44px;
+	line-height:44px;
+}
+
 .play-record {
-	font-size:22px;
-}
-#ads {
-	width: 462px;
-	margin: 32px auto 0 auto;
-}
-.hand {
-  width: 90px;
-  margin-top:2px;
-  margin-left:2px;
-  margin-right:0;
+	text-align:center;
+	font-size:18px;
 }
 
-#generate:hover {
-	background:#4ae;
+.numpad {
+	font-size:20px;
+	font-weight:300;
 }
 
-#generate:active {
-	background:#28c;
+.numpad:hover {
+	background:rgba(255,255,255,0.75);
+	color:black;
 }
 
-.hand {
-	background:#ccc;
+.numpad:active {
+	background:rgba(255,255,255,0.5);
+	color:black;
 }
 
-.hand:hover {
-	background:#eee;
-}
-
-.hand:active {
-	background:#bbb;
-}
-.hand.hand-in-hand {
-	background:#234;
+.numpad-selected {
+	background:rgba(0,0,0,0.5);
 	color:white;
 }
 
-.hand.hand-in-hand:hover {
-	background:#468;
+.numpad-selected:hover {
+	background:rgba(0,0,0,0.3);
 	color:white;
 }
 
-.hand.hand-in-hand:active {
-	background:#123;
+.numpad-selected:active {
+	background:rgba(0,0,0,0.16);
 	color:white;
 }
 
-.in-ctrl .hand.hand-in-hand {
+.in-ctrl .numpad-selected {
 	position:relative;
 	background:#432;
 	color:white;
 }
-.in-ctrl .hand.hand-in-hand:before {
-	content:"guess";
+.in-ctrl .numpad-selected:before {
+	content:"note";
 	position:absolute;
 	top:2px;
 	right:2px;
@@ -145,126 +158,138 @@ button {
 	line-height:1;
 }
 
-.in-ctrl .hand.hand-in-hand:hover {
+.in-ctrl .numpad-selected:hover {
 	background:#864;
 	color:white;
 }
 
-.in-ctrl .hand.hand-in-hand:active {
+.in-ctrl .numpad-selected:active {
 	background:#321;
 	color:white;
 }
 
-.sudoku-table {
-	border-collapse: collapse;
-	border:3px solid #234;
+.table-container {
+	position:relative;
 }
 
-.sudoku-table td {
-	border:1px solid #234;
+.overlay {
+	font-size: 48px;
+	padding-top:142px;
+	background: rgba(255,255,255,0.9);
+	z-index: 99;
+	box-sizing:border-box;
+}
+
+.overlay .record-level {
+	font-size:24px;
+}
+
+
+.table-container .layer {
+	position:absolute;
+	top:0;
+	left:0;
+}
+
+.table-container table {
+	border-collapse: collapse;
+}
+
+.block-bg td,
+.block-border td {
+	width:33.3333%;
+	height:33.3333%;
+}
+
+.cells td,
+.clickables td {
+	width:11.1111%;
+	height:11.1111%;
+}
+
+.block-bg .block-1,
+.block-bg .block-3,
+.block-bg .block-5,
+.block-bg .block-7 {
+	background:#f5f5f5;
+}
+
+.block-border td{
+	border:3px solid #35506F;
+}
+
+.cells td {
+	border:1px solid #C1CBD6;
 	position:relative;
-	width:48px;
-	height:48px;
 	text-align: center;
-	font-size: 32px;
+	font-size: 24px;
+	font-weight:300;
+	color:black;
 }
-.odd-block {
-	background:rgba(0,0,0,0.04);
-}
-.maybe {
+
+.cells .note {
+	color:#aaa;
 	font-size:14px;
+	font-weight:400;
 	line-height:1;
 	position:absolute;
 }
 
-.maybe-1 {
-  top: 3px;
-  left: 5px;
+.cells .note-1,
+.cells .note-2,
+.cells .note-3 {
+	top: 4px;	
 }
 
-.maybe-2 {
-  top: 3px;
-  left: 22px;
+.cells .note-4,
+.cells .note-5,
+.cells .note-6 {
+	top: 18px;
 }
 
-.maybe-3 {
-  top: 3px;
-  right: 5px;
+.cells .note-7,
+.cells .note-8,
+.cells .note-9 {
+	bottom: 3px;
 }
 
-.maybe-4 {
-  top: 18px;
-  left: 5px;
+.cells .note-1,
+.cells .note-4,
+.cells .note-7 {
+	left: 5px;
 }
 
-.maybe-5 {
-  top: 18px;
-  left: 22px;
+.cells .note-2,
+.cells .note-5,
+.cells .note-8 {
+	left: 21px;
 }
 
-.maybe-6 {
-  top: 18px;
-  right: 5px;
+.cells .note-3,
+.cells .note-6,
+.cells .note-9 {
+	right: 6px;
 }
 
-.maybe-7 {
-  bottom: 3px;
-  left: 5px;
-}
-
-.maybe-8 {
-  bottom: 3px;
-  left: 22px;
-}
-
-.maybe-9 {
-  bottom: 3px;
-  right: 5px;
-}
-.error .maybe,
-.solving .maybe {
+.error .note,
+.solving .note {
 	display:none;
 }
 
 .solving .input{
-	color:#05A;
+	color:#0080ff;
 }
 
 .error {
 	background:#f2dede!important;
 }
 
-.hand.solved-number,
+.numpad.solved-number,
 .active-number.solved-number {
-	background:#d9edf7;
+	background:#99CCFF;
 	color:#222;
 }
 
-
-
 .active-number {
 	background:#FFFF9B;
-}
-
-
-.box-bottom-border:after {
-	content: " ";
-	position:absolute;
-	bottom:-1px;
-	left:0;
-	width:50px;
-	height:3px;
-	background:#234;
-	z-index:1;
-}
-
-.box-right-border:before {
-	content: " ";
-	position:absolute;
-	height:50px;
-	top:0;
-	right:-1px;
-	width:3px;
-	z-index:1;
-	background:#234;
 }

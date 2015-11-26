@@ -32,19 +32,118 @@ Deferred.prototype = {
 
 var Sudoku;
 Sudoku = (function (window, document, undefined) {
-    var Sudoku, Cell, Table, sudoku_counter = 0;
+    var Difficulty, NumberFlag, Sudoku, Cell, Table, sudoku_counter = 0;
+    Difficulty = [
+        {
+            minClue : 50,
+            minCluePerX : 5
+        },{
+            minClue : 36,
+            minCluePerX : 4
+        },{
+            minClue : 32,
+            minCluePerX : 3
+        },{
+            minClue : 0,
+            minCluePerX : 0
+        }
+    ];
+
+    NumberFlag = function(val){
+        if(val !== undefined){
+            this.rawData = val; // 0b111111111 bit at 987654321 is each possibility at its position
+        }else{
+            this.rawData = 511;
+        }
+        this.length = 9;
+    };
+
+    NumberFlag.prototype = {
+        clear : function(){
+            this.rawData = 0;
+            this.length = 0;
+            return this;
+        }, fromArray : function(arr){
+            this.clear();
+            for(var i=0; i<arr.length; i++){
+                this.add(arr[i]);
+            }
+            return this;
+        }, getRandom : function(){
+            var ret = [], rand = Math.floor(Math.random()*this.length);
+            for(var i=0; i<9; i++){
+                if(0 != (this.rawData & (1<<i))){
+                    if(rand<=0){
+                        this.remove(i+1);
+                        this.length--;
+                        return i+1;
+                    }else{
+                        rand--;
+                    }
+                }
+            }
+        }, shift : function(){
+            var ret = [];
+            for(var i=0; i<9; i++){
+                var x = 1<<i;
+                if(0 != (this.rawData & x)){
+                    this.rawData = this.rawData & ~x;
+                    this.length--;
+                    return i+1;
+                }
+            }
+        }, toArray : function(){
+            var ret = [];
+            for(var i=0; i<9; i++){
+                if(0 != (this.rawData & (1<<i))){
+                    ret.push(i+1);
+                }
+            }
+            return ret;
+        }, add : function(val){
+            if(val<1 || val>9){ return; }
+            val--;
+            var d = this.rawData | (1<<val);
+            if(d != this.rawData)
+                this.length++;
+            this.rawData = d;
+            return this;
+        }, remove : function(val){
+            if(val<1 || val>9){ return; }
+            val--;
+            var d = this.rawData & ~(1<<val);
+            if(d != this.rawData)
+                this.length--;
+            this.rawData = d;
+            return this;
+        }, subtract : function(other){
+            if(other.rawData == 0) return;
+            var d = this.rawData ^ (this.rawData & other.rawData);
+            //http://stackoverflow.com/questions/109023/how-to-count-the-number-of-set-bits-in-a-32-bit-integer
+            var i = d;
+            i = i - ((i >> 1) & 0x55555555);
+            i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
+            this.length = (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
+
+            this.rawData = d;
+            return this;
+        }
+    }
 
     Cell = function(a){
         var i = parseInt(a/9), j = a%9;
+        //Constants
         this.id = a;
         this.row = i;
         this.col = j;
         this.block = 3*parseInt(i / 3) + parseInt(j / 3);
-        this.idInBlock = (i%3)*3 + j%3;
         this.related = [];
+        this.rid = 'ABCDEFGHI'[Math.floor(a/10)] + (a%9 + 1);
+
+        //Public attributes
         this.value = 0;
-        this.given = true;
-		this.solving = false;
+        this.isClue = true;
+		this.isUserInput = false;
     };
 
     Cell.prototype = {
@@ -52,13 +151,11 @@ Sudoku = (function (window, document, undefined) {
             return this.related.length == 20;
         },
         possibles: function(){
-            if(!this.initialized()) return [];
-            var possibles = [1,2,3,4,5,6,7,8,9];
-            for(i=0; i<20; i++){
-                if(this.related[i].given){
-                    var index = possibles.indexOf(this.related[i].value);
-                    if(index>=0)
-                        possibles.splice(index,1);
+            //THIS ONE TAKES 2/3 OF THE TIME OF SOLVE FUNCTION
+            var possibles = new NumberFlag(), a=0;
+            for(i=0; i<20 && possibles.length>0; i++){
+                if(this.related[i].isClue || this.related[i].isUserInput){
+                    possibles.remove(this.related[i].value)
                 }
             }
             return possibles;
@@ -69,7 +166,7 @@ Sudoku = (function (window, document, undefined) {
 			}
             var myval = this.value;
             for(i=0; i<20; i++){
-                if((this.related[i].given || this.related[i].solving) && myval == this.related[i].value){
+                if((this.related[i].isClue || this.related[i].isUserInput) && myval == this.related[i].value){
 					return true;
 				}
             }
@@ -102,183 +199,195 @@ Sudoku = (function (window, document, undefined) {
             var cloneTable = new Table();
             for(var i=0; i<81; i++){
                 cloneTable.cells[i].value = this.cells[i].value;
-                cloneTable.cells[i].given = this.cells[i].given;
+                cloneTable.cells[i].isClue = this.cells[i].isClue;
             }
             return cloneTable;
         }
-        this.emptyCells = function(){ return cells.filter(function(a){ return a.value == 0 || !a.given  }) };
-        this.givenCells = function(){ return cells.filter(function(a){ return a.given }) };
+        this.emptyCells = function(){ return cells.filter(function(a){ return a.value == 0 || !a.isClue  }) };
+        this.clues = function(){ return cells.filter(function(a){ return a.isClue }) };
         this.log = function(){
             var retval = "";
             for(var i=0; i<9; i++){
                 for(var j=0; j<9; j++){
-                    if(!this.cells[i*9 + j].given)
-                        retval += "x ";
+                    if(!this.cells[i*9 + j].isClue)
+                        retval += "[" + 'x123456789'[this.cells[i*9 + j].value] + "]";
                     else
-                        retval += this.cells[i*9 + j].value + " ";
+                        retval += " " + this.cells[i*9 + j].value + " ";
                 }
                 retval += "\n";
             }
             console.log(retval);
         }
+        this.load = function(str){
+            for(var i=0; i<81; i++){
+                var number = parseInt(str[i]);
+                this.cells[i].value = number;
+                this.cells[i].isClue = (number != 0);
+                this.cells[i].isUserInput = false;
+            }
+
+            return true;
+        }
     };
 
     Sudoku = function (options) {
         this.table = new Table();
-        var table = this.table;
-        var self = this;
-        this.solve = function(theTable){
-            theTable = theTable || table;
-            var deferred = new Deferred();
-            //Initialize information, Clone table only for solving
-            var solvingTable = theTable.clone(), cells=solvingTable.cells, queue;
+        
+
+        this.load = function(str){
+            this.table.load(str);
+        };
+
+        this.solve = function(_table){
+
+            var table = (_table || new Table()).clone(),
+                cells = table.cells,
+                queue = table.emptyCells();
+
             for(var i=0; i<81; i++){
-                cells[i].visited = [];
+                cells[i].visited = new NumberFlag(0);
+                cells[i].isUserInput = false;
             }
 
-            //Sort queue by the number of possible answer numbers
-            queue = solvingTable.emptyCells();
+            /* IMPORTANT FOR PERFORMANCE */
+            // ORDER BY COUNT(cell.possibles()) ASC, cell.id ASC
             queue.sort(function(a,b){
-                var comp = a.possibles().length - b.possibles().length;
-                return comp!=0?comp: a.id - b.id;
+                return (a.possibles().length - b.possibles().length) || (a.id - b.id);
             });
 
-            var cursor= 0;
-            //Safe While #1
-            var perfTime= new Date(); setTimeout((function backtrack(){
-                while(cursor<queue.length && cursor>=0){
-
-                    var cell = queue[cursor];
-                    var possibles = cell.possibles().diff(cell.visited);
-                    if(possibles.length<=0){
-                        cell.value = 0;
-                        cell.visited = [];
-                        cursor--;
-                    }else{
-                        cell.value = possibles.pickRandom();
-                        cell.visited.push(cell.value);
-                        cursor++;
-                    }
-
-                    //Safe While #2
-                    var perfTime2 = new Date();
-                    if(perfTime2 - perfTime > 1000) {
-                        perfTime = perfTime2;
-                        setTimeout(backtrack, 1);
-                        return;
-                    }
+            var cursor = 0;
+            while(0 <= cursor && cursor < queue.length){
+                var cell = queue[cursor];
+                var possibles = cell.possibles()
+                possibles.subtract(cell.visited);
+                
+                if(possibles.length>0){
+                    cell.value = possibles.getRandom();
+                    cell.isUserInput = true;
+                    cell.visited.add(cell.value);
+                    cursor++;
+                } else {
+                    cell.value = 0;
+                    cell.isUserInput = false;
+                    cell.visited.clear();
+                    cursor--;
                 }
-                if(cursor<=0){
-                    deferred.reject();
-                }else{
-                    deferred.resolve(solvingTable);
-                }
-            }),1);
-            return deferred;
+            }
+
+            if(cursor<=0){
+                return false;
+            }
+
+            for(var i=0; i<81; i++){
+                delete cells[i].visited;
+                cells[i].isUserInput = false;
+            }
+            return table;
         };
-		
-		var levelIndex = 0;
-		
-		var levelSettings = [{
-			priorityAlgorithm: function(a,b){ return Math.floor(Math.random()*2)*2-1; },
-			minSubGiven: 5,
-			minTotalGiven: 50
-		},{
-			priorityAlgorithm: function(a,b){ return Math.floor(Math.random()*2)*2-1; },
-			minSubGiven: 4,
-			minTotalGiven: 36
-		},{
-			priorityAlgorithm: function(a,b){ 
-				var retval = a.id%2 - b.id%2;
-				return retval!=0?retval:a.id - b.id;
-			},
-			minSubGiven: 3,
-			minTotalGiven: 32
-		},{
-			priorityAlgorithm: function(a,b){ 
-				var ax = a.row*9 + (a.row%2==0?a.col:9-a.col);
-				var bx = b.row*9 + (b.row%2==0?b.col:9-b.col);
-				return ax - bx;
-			},
-			minSubGiven: 2,
-			minTotalGiven: 28
-		},{
-			priorityAlgorithm: function(a,b){ return a.id - b.id; },
-			minSubGiven: 0,
-			minTotalGiven: 0
-		}];
-		
-		this.level = function(lv){
-			if(typeof lv =='number' && 0 <= lv && lv <= 4){
-				levelIndex = lv;
-			}
-			return levelIndex;
-		}
-        this.generate = function(){
-            var self = this
-                ,deferred = new Deferred();
-            this.solve().done(function(solution){
-                var queue=solution.cells.slice(0)
-				    ,thisLevel = levelSettings[levelIndex];
-					
-                queue.sort(thisLevel.priorityAlgorithm);
-                (function cycle() {
-                    var continueCycle = function(){
-                            if(queue.length) setTimeout(cycle,1);
-                            else deferred.resolve(solution);
-                        },cell = queue.shift()
-                        ,originalValue = cell.value
-                        ,givenCells = solution.givenCells()
-                        ,GivenNotEnough = true
-                        ,a= ['row','col','block'];
 
-                    for(var i=0; i<a.length; i++){
-                        //number of given cells in a same [row,col,block for each loop] >= numLineGiven
-                        if(givenCells.filter(function(b){ return b[a[i]] == cell[a[i]]; }).length >= thisLevel.minSubGiven) {
-                            GivenNotEnough = false;
-                            break;
-                        }
-                    }
-                    if( GivenNotEnough || givenCells.length < thisLevel.minTotalGiven ){
-                        cell.given = true;
-                        continueCycle();
-                        return;
-                    }
+        this.dig = function(_solution, level){
+            var level = level === undefined?0:level,
+                minClue = Difficulty[level].minClue,
+                minCluePerX = Difficulty[level].minCluePerX,
+                solution = _solution.clone(),
+                deferred = new Deferred(),
+                queue=solution.clues();
 
-                    var possibles = cell.possibles().diff(originalValue);
-                    if(possibles.length>0){
-                        var conflict = false;
-                        var cloneTable = solution.clone();
-                        (function trySolve(){
-                            cloneTable.cells[cell.id].value = possibles.shift();
-                            self.solve(cloneTable).done(function(){
-                                cell.given = true;
-                                continueCycle();
-                            }).fail(function(){
-                                if(possibles.length>0){
-                                    trySolve();
-                                }else{
-                                    cell.given=false;
-                                    continueCycle();
-                                }
-                            });
-                        })();
+            var num_num = {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
+            var check = ['row','col','block'];
+            var num_clues_per = {};
+            var num_clues = 0;
+
+            num_clues_per.row = {0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
+            num_clues_per.col = {0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
+            num_clues_per.block = {0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
+
+            for(var i=0; i<81; i++){
+                num_num[solution.cells[i].value]++;
+                for(var j=0; j<check.length;j++){
+                    num_clues_per[check[j]][solution.cells[i][check[j]]]++;
+                }
+                if(solution.cells[i].isClue)
+                    num_clues++;
+            }
+
+            var pass_restriction = function(cell){
+                if(num_clues <= minClue ){
+                    return false;
+                }
+                for(var j=0; j<check.length;j++){
+                    if(num_clues_per[check[j]][cell[check[j]]] <= minCluePerX)
+                        return false;
+                }
+                return true;
+            }
+
+            var sorting = function(a,b){ return (num_num[b.value] - num_num[a.value]) || (a.id-b.id); };
+            
+            queue.sort(sorting);
+
+            while(queue.length > 0){
+                var cell = solution.cells[queue.shift().id],
+                    value = cell.value,
+                    possibles = cell.possibles().remove(value);
+                
+                if(!pass_restriction(cell)){
+                    continue;
+                }
+
+                cell.isClue = false;
+                while(possibles.length>0){
+                    cell.value = possibles.shift();
+                    cell.isClue = true; //not to be handled by solver. (solver handles both not given and 0-value cells)
+                    var ret = this.solve(solution);
+                    if(ret === false){
+                        cell.isClue = false;
                     }else{
-                        cell.given = false;
-                        continueCycle();
+                        break;
                     }
-                })();
-            });
-            deferred.done(function(solution){
-                self.table = solution;
-            });
-            return deferred;
+                }
+                
+                if(!cell.isClue){
+                    num_clues--;
+                    for(var j=0; j<check.length;j++){
+                        num_clues_per[check[j]][cell[check[j]]]--;
+                    }
+                    num_num[value]--;
+                    queue.sort(sorting);
+                }
+
+                cell.value = value;
+            }
+            return solution;
+        };
+
+        this.generate = function(level){
+            this.table = this.dig(this.solve(), level)
+            return this.table;
+        };
+
+        this.generate22 = function(){
+            var min=81, minSudoku, freq = {};
+            for(var i=0;i<22;i++){
+                console.time('Generate sudoku')
+                var ss = this.solve();
+                var s = this.dig(ss),
+                    x = s.clues().length;
+                freq[x] = (x in freq?freq[x]:0) + 1;
+                if(min > x){
+                    minSudoku = s;
+                    min = x;
+                }
+                console.timeEnd('Generate sudoku')
+                console.log(freq);
+            }
+            return this.table = minSudoku;
         };
     };
 
+    Sudoku.Difficulty = Difficulty;
     Sudoku.Cell = Cell;
     Sudoku.Table = Table;
+    Sudoku.NumberFlag = NumberFlag;
     return Sudoku;
 })(window, document);
-
-sudoku=new Sudoku();
