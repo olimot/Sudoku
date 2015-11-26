@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="style.css">
 	<link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
     <script src="/jquery-2.1.4.min.js"></script>
-	<script src="jquery.mobile.custom.min.js"></script>
+	<script src="/jquery.mobile.custom.min.js"></script>
   </head>
   <body>
   	<img src="screenshot.png" alt="Screenshot Preview" style="position:fixed;top:-9999px;"/>
