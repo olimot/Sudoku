@@ -249,16 +249,13 @@ Sudoku = (function (window, document, undefined) {
                 cells[i].isUserInput = false;
             }
 
-            /* IMPORTANT FOR PERFORMANCE */
-            // ORDER BY COUNT(cell.possibles()) ASC, cell.id ASC
-            queue.sort(function(a,b){
-                return (a.possibles().length - b.possibles().length) || (a.id - b.id);
-            });
+            /* Start with a single candidate to multiples */
+            queue.sort(function(a,b){ return (a.possibles().length - b.possibles().length) || (a.id - b.id); });
 
             var cursor = 0;
             while(0 <= cursor && cursor < queue.length){
                 var cell = queue[cursor];
-                var possibles = cell.possibles()
+                var possibles = cell.possibles();
                 possibles.subtract(cell.visited);
                 
                 if(possibles.length>0){
@@ -266,6 +263,22 @@ Sudoku = (function (window, document, undefined) {
                     cell.isUserInput = true;
                     cell.visited.add(cell.value);
                     cursor++;
+
+                    //Swap the next to the cell that has the minimum number of possibles
+                    var minNumPossible = 9; next = -1;
+                    for(var i=cursor; i<queue.length; i++){
+                        var len = queue[i].possibles().length;
+                        if(len < minNumPossible){
+                            minNumPossible = len;
+                            next = i;
+                        }
+                    }
+                    if(next != -1){
+                        var t = queue[cursor];
+                        queue[cursor] = queue[next];
+                        queue[next] = t;
+                    }
+                    
                 } else {
                     cell.value = 0;
                     cell.isUserInput = false;
@@ -368,10 +381,10 @@ Sudoku = (function (window, document, undefined) {
 
         this.generate22 = function(){
             var min=81, minSudoku, freq = {};
-            for(var i=0;i<22;i++){
+            for(var i=0;i<370;i++){
                 console.time('Generate sudoku')
                 var ss = this.solve();
-                var s = this.dig(ss),
+                var s = this.dig(ss, 3),
                     x = s.clues().length;
                 freq[x] = (x in freq?freq[x]:0) + 1;
                 if(min > x){
