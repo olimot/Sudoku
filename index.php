@@ -37,6 +37,7 @@ In the table you can use:
 	;(function($, window, document, undefined){
 		$.Sudoku = function(game){
 
+
 			// Set Playing Data
 			//
 			var generatingLevel = 0;
@@ -90,6 +91,7 @@ In the table you can use:
 				$bottomline.append($btn)
 			}
 
+
 			//Assembly html
 			//
 			$this
@@ -107,8 +109,54 @@ In the table you can use:
 			$this.append($bottomline
 				.append($playRecord));
 
+
 			// Define all actions
 			//
+			function renderGameTable(){
+				$overlay.fadeOut();
+
+				//Reset number pads
+				$('.solved-number').removeClass('solved-number');
+
+				//Reset cells
+				var num_clues = 0;
+				$cells.find('.note').remove();
+				$cells.find('td').removeClass().each(function(index){
+					if(game.table.cells[index].isClue){
+						num_clues++;
+						$(this).html( game.table.cells[index].value ).addClass('clue number-'+game.table.cells[index].value);
+					}else{
+						game.table.cells[index].isUserInput = false;
+						$(this).html('<span class="input"></div>');
+					}
+				});
+				$info.html(num_clues+' clues');
+				
+				//Reset record
+				$playRecord.data('record', 0);
+				clearInterval($playRecord.data('timer'));
+				$playRecord.html(' 00:00:00 ');
+				$playRecord.data('timer', setInterval(function(){
+					$playRecord.data('record', $playRecord.data('record')+1);
+					var record = $playRecord.data('record');
+					var hour = parseInt(record / 3600);
+					var min = parseInt( (record/60) ) % 60;
+					var sec = record % 60;
+					if(hour<10) hour = '0' + hour;
+					if(min<10) min = '0' + min;
+					if(sec<10) sec = '0' + sec;
+					$playRecord.html(' '+hour+':'+min+':'+sec+' ');
+				}, 1000));
+				$('.number-'+playingNumber).addClass('active-number');
+				for(var i=1;i<=9;i++){
+					if($('.number-'+i).length == 9)
+						$('.numpad-'+i+', .number-'+i).addClass('solved-number');
+				}
+			}
+
+			//for debugging, uncomment below and you can use this in console
+			//window.renderGameTable = renderGameTable;
+
 			$generator.on('tap', function(e){
 				console.time('Generate sudoku');
 				e.preventDefault(); 
@@ -116,54 +164,15 @@ In the table you can use:
 				if(generatingLevel>=Sudoku.Difficulty.length){
 					$.get('import.php', function(str){
 						game.load(str);
-						resetView();
+						renderGameTable();
+						console.timeEnd('Generate sudoku');
 					})
 					return;
 				}
 				game.generate(generatingLevel);
-				resetView();
+				renderGameTable();
 				console.timeEnd('Generate sudoku');
 
-				function resetView(){
-					$overlay.fadeOut();
-
-					//Reset number pads
-					$('.solved-number').removeClass('solved-number');
-
-					//Reset cells
-					var num_clues = 0;
-					$cells.find('.note').remove();
-					$cells.find('td').removeClass().each(function(index){
-						if(game.table.cells[index].isClue){
-							num_clues++;
-							$(this).html( game.table.cells[index].value ).addClass('clue number-'+game.table.cells[index].value);
-						}else{
-							$(this).html('<span class="input"></div>');
-						}
-					});
-					$info.html(num_clues+' clues');
-					
-					//Reset record
-					$playRecord.data('record', 0);
-					clearInterval($playRecord.data('timer'));
-					$playRecord.html(' 00:00:00 ');
-					$playRecord.data('timer', setInterval(function(){
-						$playRecord.data('record', $playRecord.data('record')+1);
-						var record = $playRecord.data('record');
-						var hour = parseInt(record / 3600);
-						var min = parseInt( (record/60) ) % 60;
-						var sec = record % 60;
-						if(hour<10) hour = '0' + hour;
-						if(min<10) min = '0' + min;
-						if(sec<10) sec = '0' + sec;
-						$playRecord.html(' '+hour+':'+min+':'+sec+' ');
-					}, 1000));
-					$('.number-'+playingNumber).addClass('active-number');
-					for(var i=1;i<=9;i++){
-						if($('.number-'+i).length == 9)
-							$('.numpad-'+i+', .number-'+i).addClass('solved-number');
-					}
-				}
 			}).on('swipeleft', function(e){
 				$btnEasier.trigger('click');
 				e.preventDefault();
@@ -174,6 +183,7 @@ In the table you can use:
 				e.stopPropagation();
 			});
 
+
 			$btnEasier.click(function(){
 				generatingLevel = Math.max(0, generatingLevel-1);
 				$generator.html(generate_label());
@@ -183,6 +193,7 @@ In the table you can use:
 				generatingLevel = Math.min(4, generatingLevel+1);
 				$generator.html(generate_label());
 			});
+
 
 			$clickables.find('td').on('mousedown', function(e){
 				e.preventDefault();
@@ -269,7 +280,6 @@ In the table you can use:
 				return false;
 			}).on('contextmenu', function(){return false;})
 
-			
 
 			$bottomline.find('.numpad').on('click',function(e){
 				$('.numpad-selected').removeClass('numpad-selected');
@@ -304,6 +314,7 @@ In the table you can use:
 				}
 			});
 			
+
 			return $this;
 		}
 	})($, window,document);
