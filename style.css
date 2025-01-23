@@ -1,305 +1,315 @@
 body {
-	font-family:"Open Sans", Arial;
-	color:#35506F;
-	font-size:16px;
-	font-weight:400;
-	margin:0;
-	padding:0;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+		"Noto Sans",
+    "Open Sans",
+    "Helvetica Neue",
+    sans-serif;
+  color: #35506f;
+  font-size: 16px;
+  font-weight: 400;
+  margin: 0;
+  padding: 0;
 }
 
 button {
-	font-size:inherit;
-	font-weight:inherit;
-	font-family:inherit;
-	box-sizing:border-box;
-	border:0;
-	margin:0;
-	padding:0;
-	color:inherit;
-	background:none;
-	outline:0;
-	line-height:44px;
-	height:44px;
+  font-size: inherit;
+  font-weight: inherit;
+  font-family: inherit;
+  box-sizing: border-box;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  background: none;
+  outline: 0;
+  line-height: 44px;
+  height: 44px;
 }
 
-button, td {
-	-moz-transition: all .1s ease-in;
-    -o-transition: all .1s ease-in;
-    -webkit-transition: all .1s ease-in;
-    transition: all .1s ease-in;
+button,
+td {
+  -moz-transition: all 0.1s ease-in;
+  -o-transition: all 0.1s ease-in;
+  -webkit-transition: all 0.1s ease-in;
+  transition: all 0.1s ease-in;
 }
 
 .menu {
-	margin:3px 0;
-	overflow:hidden;
+  margin: 3px 0;
+  overflow: hidden;
 }
 
 #GameView {
-	position:relative;
-	text-align:center;
-	-webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  position: relative;
+  text-align: center;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .btn-link {
-	cursor:pointer;
-	color:#00f;
-	text-decoration: underline;
+  cursor: pointer;
+  color: #00f;
+  text-decoration: underline;
 }
 /* Dimensions */
 
 #contents,
 #GameView {
-	display:block;
-	margin:0 auto;
-	width:460px;
+  display: block;
+  margin: 0 auto;
+  width: 460px;
 }
 
 .table-container,
 .table-container .layer {
-	width:460px;
-	height:460px;
+  width: 460px;
+  height: 460px;
 }
-
 
 /* Outer Contents of Game */
 
-
 /* Menu */
 .menu {
-	color:white;
-	background:#0080ff;
+  color: white;
+  background: #0080ff;
 }
 
 .menu-top {
-	background:#35506F;
+  background: #35506f;
 }
 
 .menu-top button {
-	padding:0 22px;
-	cursor:pointer;
-	color:rgba(255,255,255,0.8);
+  padding: 0 22px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .menu-top button:hover {
-	color:#0080FF;
-	color:#fff;
+  color: #0080ff;
+  color: #fff;
 }
 
 .menu-top button:active {
-	color:#ff0;
+  color: #ff0;
 }
 
 .btn-generate {
-	width:66%;
+  width: 66%;
 }
 
 .btn-generate.initial {
-	color:white;
-	background:#e00;
+  color: white;
+  background: #e00;
 }
 
 .sudoku-info {
-	font-size:12px;
-	line-height:16px;
-	height:16px;
-	text-align:right;
+  font-size: 12px;
+  line-height: 16px;
+  height: 16px;
+  text-align: right;
 }
 
 .play-record,
 .numpad {
-	width: 20%;
-	display:block;
-	float:left;
-	height:44px;
-	line-height:44px;
+  width: 20%;
+  display: block;
+  float: left;
+  height: 44px;
+  line-height: 44px;
 }
 
 .play-record {
-	text-align:center;
-	font-size:18px;
+  text-align: center;
+  font-size: 18px;
 }
 
 .numpad {
-	font-size:20px;
-	font-weight:300;
+  font-size: 20px;
+  font-weight: 300;
 }
 
 .numpad:hover {
-	background:rgba(255,255,255,0.75);
-	color:black;
+  background: rgba(255, 255, 255, 0.75);
+  color: black;
 }
 
 .numpad:active {
-	background:rgba(255,255,255,0.5);
-	color:black;
+  background: rgba(255, 255, 255, 0.5);
+  color: black;
 }
 
 .numpad-selected {
-	background:rgba(0,0,0,0.5);
-	color:white;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
 }
 
 .numpad-selected:hover {
-	background:rgba(0,0,0,0.3);
-	color:white;
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
 }
 
 .numpad-selected:active {
-	background:rgba(0,0,0,0.16);
-	color:white;
+  background: rgba(0, 0, 0, 0.16);
+  color: white;
 }
 
 .in-ctrl .numpad-selected {
-	position:relative;
-	background:#432;
-	color:white;
+  position: relative;
+  background: #432;
+  color: white;
 }
 .in-ctrl .numpad-selected:before {
-	content:"note";
-	position:absolute;
-	top:2px;
-	right:2px;
-	font-size:13px;
-	line-height:1;
+  content: "note";
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 13px;
+  line-height: 1;
 }
 
 .in-ctrl .numpad-selected:hover {
-	background:#864;
-	color:white;
+  background: #864;
+  color: white;
 }
 
 .in-ctrl .numpad-selected:active {
-	background:#321;
-	color:white;
+  background: #321;
+  color: white;
 }
 
 .table-container {
-	position:relative;
+  position: relative;
 }
 
 .overlay {
-	font-size: 48px;
-	padding-top:142px;
-	background: rgba(255,255,255,0.9);
-	z-index: 99;
-	box-sizing:border-box;
+  font-size: 48px;
+  padding-top: 142px;
+  background: rgba(255, 255, 255, 0.9);
+  z-index: 99;
+  box-sizing: border-box;
 }
 
 .overlay .record-level {
-	font-size:24px;
+  font-size: 24px;
 }
 
-
 .table-container .layer {
-	position:absolute;
-	top:0;
-	left:0;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .table-container table {
-	border-collapse: collapse;
+  border-collapse: collapse;
 }
 
 .block-bg td,
 .block-border td {
-	width:33.3333%;
-	height:33.3333%;
+  width: 33.3333%;
+  height: 33.3333%;
 }
 
 .cells td,
 .clickables td {
-	width:11.1111%;
-	height:11.1111%;
+  width: 11.1111%;
+  height: 11.1111%;
 }
 
 .block-bg .block-1,
 .block-bg .block-3,
 .block-bg .block-5,
 .block-bg .block-7 {
-	background:#f5f5f5;
+  background: #f5f5f5;
 }
 
-.block-border td{
-	border:3px solid #35506F;
+.block-border td {
+  border: 3px solid #35506f;
 }
 
 .cells td {
-	border:1px solid #C1CBD6;
-	position:relative;
-	text-align: center;
-	font-size: 24px;
-	font-weight:300;
-	color:black;
+  border: 1px solid #c1cbd6;
+  position: relative;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 300;
+  color: black;
 }
 
 .cells .note {
-	color:#aaa;
-	font-size:14px;
-	font-weight:400;
-	line-height:1;
-	position:absolute;
+  color: #aaa;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1;
+  position: absolute;
 }
 
 .cells .note-1,
 .cells .note-2,
 .cells .note-3 {
-	top: 4px;	
+  top: 4px;
 }
 
 .cells .note-4,
 .cells .note-5,
 .cells .note-6 {
-	top: 18px;
+  top: 18px;
 }
 
 .cells .note-7,
 .cells .note-8,
 .cells .note-9 {
-	bottom: 3px;
+  bottom: 3px;
 }
 
 .cells .note-1,
 .cells .note-4,
 .cells .note-7 {
-	left: 5px;
+  left: 5px;
 }
 
 .cells .note-2,
 .cells .note-5,
 .cells .note-8 {
-	left: 21px;
+  left: 21px;
 }
 
 .cells .note-3,
 .cells .note-6,
 .cells .note-9 {
-	right: 6px;
+  right: 6px;
 }
 
 .error .note,
 .solving .note {
-	display:none;
+  display: none;
 }
 
-.solving .input{
-	color:#0080ff;
+.solving .input {
+  color: #0080ff;
 }
 
 .error {
-	background:#f2dede!important;
+  background: #f2dede !important;
 }
 
 .numpad.solved-number,
 .active-number.solved-number {
-	background:#99CCFF;
-	color:#222;
+  background: #99ccff;
+  color: #222;
 }
 
 .active-number {
-	background:#FFFF9B;
+  background: #ffff9b;
 }
