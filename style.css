@@ -45,6 +45,11 @@ button, td {
     user-select: none;
 }
 
+.btn-link {
+	cursor:pointer;
+	color:#00f;
+	text-decoration: underline;
+}
 /* Dimensions */
 
 #contents,
@@ -91,6 +96,11 @@ button, td {
 
 .btn-generate {
 	width:66%;
+}
+
+.btn-generate.initial {
+	color:white;
+	background:#e00;
 }
 
 .sudoku-info {
